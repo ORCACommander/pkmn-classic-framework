@@ -51,7 +51,9 @@ namespace PkmnFoundations.GTS
                     try
                     {
 #endif
-                        // todo: Figure out what fun stuff is contained in this blob!
+                    // this blob appears to share the same format with GenIV only with (obviously) a GenV string for the trainer name
+                    // and the email-related fields dummied out.
+                    // Specifically, email, notification status, and the two secrets appear to always be 0.
                         byte[] profileBinary = new byte[100];
                         Array.Copy(request, 0, profileBinary, 0, 100);
                         TrainerProfile5 profile = new TrainerProfile5(pid, profileBinary);
@@ -120,6 +122,9 @@ namespace PkmnFoundations.GTS
                     {
                         // No pokemon in the system
                         // what do here?
+                        // todo: we should probably repeat the previous record
+                        // that was in here before delete.asp was called.
+                        // That is... if we still had it. -__-;
                         ShowError(context, 400);
                         return;
                     }
@@ -218,12 +223,13 @@ namespace PkmnFoundations.GTS
                     byte[] recordBinary = new byte[296];
                     Array.Copy(request, 0, recordBinary, 0, 296);
                     GtsRecord5 record = new GtsRecord5(pokedex, recordBinary);
+                    record.IsExchanged = 0;
 
                     // todo: figure out what bytes 296-431 do:
                     // appears to be 4 bytes of 00, 128 bytes of stuff, 4 bytes of 80 00 00 00
                     // probably a pkvldtprod signature
 
-                    if (!record.Validate(false))
+                    if (!record.Validate())
                     {
                         // hack check failed
                         SessionManager.Remove(session);
@@ -251,7 +257,6 @@ namespace PkmnFoundations.GTS
                     // The server must provide them instead.
                     record.TimeDeposited = DateTime.UtcNow;
                     record.TimeExchanged = null;
-                    record.IsExchanged = 0;
                     record.PID = pid;
 
                     session.Tag = record;
@@ -372,7 +377,7 @@ namespace PkmnFoundations.GTS
                     }
 
                     // enforce request requirements server side
-                    if (!upload.Validate(true) || !upload.CanTrade(result))
+                    if (!upload.Validate() || !upload.CanTrade(result))
                     {
                         // todo: find the correct codes for these
                         SessionManager.Remove(session);

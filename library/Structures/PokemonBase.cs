@@ -55,9 +55,9 @@ namespace PkmnFoundations.Structures
 
         private LazyKeyValuePair<int, Species> m_species_pair;
         public int SpeciesID
-        { 
+        {
             get { return m_species_pair.Key; }
-            set 
+            set
             {
                 // changing species will cause the looked up Form to be
                 // incorrect so null it out.
@@ -68,7 +68,7 @@ namespace PkmnFoundations.Structures
         public Species Species
         {
             get { return m_species_pair.Value; }
-            set 
+            set
             {
                 m_species_pair.Value = value;
                 m_form_pair.Invalidate();
@@ -123,7 +123,7 @@ namespace PkmnFoundations.Structures
         public IList<MoveSlot> Moves { get { return m_moves; } }
         public uint TrainerID { get; set; }
         public uint Personality { get; set; }
-        public Natures Nature { get { return (Natures)(Personality % 25u); } }
+        public virtual Natures Nature { get { return (Natures)(Personality % 25u); } }
         public byte Happiness { get; set; }
         public Languages Language { get; set; }
         public IvStatValues IVs { get; set; }
